@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="intro">
+  <div><p class="eyebrow">RENTAL PROPERTY MANAGEMENT</p><h1>Find a place to call home.</h1>
+  <p class="sub">Search rental properties, register listings, and review platform activity.</p></div>
+  <span class="tag">MongoDB + Python + Flask</span>
+</section>
+{% if not connected %}
+<div class="notice error"><strong>MongoDB is not connected.</strong> The website is running, but it cannot load project records. Set the MONGODB_URI environment variable to a working MongoDB database. {% if connection_error %}<details><summary>Connection details</summary><code>{{ connection_error }}</code></details>{% endif %}</div>
+{% endif %}
+<section class="stats">
+  <article><span>LISTINGS</span><strong>{{ stats.properties }}</strong></article>
+  <article><span>REGISTERED USERS</span><strong>{{ stats.users }}</strong></article>
+  <article><span>PROPERTY REPORTS</span><strong>{{ stats.reports }}</strong></article>
+  <article><span>VIEWING REQUESTS</span><strong>{{ stats.views }}</strong></article>
+</section>
+<section class="panel">
+  <div class="panel-head"><div><p class="eyebrow">PROPERTY DIRECTORY</p><h2>Available rentals</h2></div><button class="primary" onclick="document.getElementById('add-form').scrollIntoView({behavior:'smooth'})">+ Add property</button></div>
+  <form class="search" method="get" action="/">
+    <input name="district" placeholder="Search by district (e.g. Luwero)" value="{{ district }}">
+    <input name="max_rent" type="number" min="0" placeholder="Maximum monthly rent (UGX)" value="{{ max_rent }}">
+    <button class="primary" type="submit">Search</button><a class="button secondary" href="{{ url_for('index') }}">Show all</a>
+  </form>
+  {% if properties %}
+  <div class="table-wrap"><table><thead><tr><th>ID</th><th>Property</th><th>District / Area</th><th>Bedrooms</th><th>Monthly rent</th><th>Deposit</th><th>Availability</th><th>Verification</th></tr></thead><tbody>
+  {% for p in properties %}<tr><td>{{ p.get('_id','') }}</td><td><strong>{{ p.get('title','') }}</strong><small>{{ p.get('propertyType','') }}</small></td><td>{{ p.get('district','') }}<small>{{ p.get('area','') }}</small></td><td>{{ p.get('bedrooms','') }}</td><td>UGX {{ "{:,}".format(p.get('monthlyRentUGX',0)|int) }}</td><td>UGX {{ "{:,}".format(p.get('depositUGX',0)|int) }}</td><td><span class="pill green">Available</span></td><td><span class="pill">{{ p.get('verificationStatus','') }}</span></td></tr>{% endfor %}
+  </tbody></table></div>
+  {% elif connected %}<div class="empty">No available properties match your search.</div>{% endif %}
+</section>
+<section class="lower-grid">
+  <section class="panel" id="add-form"><p class="eyebrow">NEW LISTING</p><h2>Register a property</h2>
+    <form class="property-form" method="post" action="{{ url_for('add_property') }}">
+      <label>Property ID<input name="property_id" placeholder="e.g. P006" required></label>
+      <label>Property title<input name="title" placeholder="Two-bedroom house near town" required></label>
+      <label>District<input name="district" placeholder="Luwero" required></label>
+      <label>Area<input name="area" placeholder="Luwero Town"></label>
+      <label>Property type<select name="property_type"><option>house</option><option>apartment</option><option>single_room</option><option>studio</option></select></label>
+      <label>Bedrooms<input name="bedrooms" type="number" min="0" value="1" required></label>
+      <label>Monthly rent (UGX)<input name="rent" type="number" min="0" required></label>
+      <label>Deposit (UGX)<input name="deposit" type="number" min="0" required></label>
+      <label class="full">Advertiser user ID<input name="advertiser_id" placeholder="e.g. U002" required></label>
+      <button class="primary full" type="submit">Save property listing</button>
+      <p class="hint full">New listings are automatically marked <b>pending</b> for verification.</p>
+    </form>
+  </section>
+  <section class="panel"><p class="eyebrow">DATABASE COLLECTIONS</p><h2>Project records</h2><p class="sub">Explore the four collections created by the original MongoDB setup script.</p>
+    <nav class="collection-links">
+      <a href="{{ url_for('records', collection='properties') }}">Properties <span>View records →</span></a>
+      <a href="{{ url_for('records', collection='users') }}">Users <span>View records →</span></a>
+      <a href="{{ url_for('records', collection='propertyReports') }}">Property reports <span>View records →</span></a>
+      <a href="{{ url_for('records', collection='viewingRequests') }}">Viewing requests <span>View records →</span></a>
+    </nav>
+  </section>
+</section>
+{% endblock %}

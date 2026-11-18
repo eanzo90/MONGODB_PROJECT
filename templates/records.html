@@ -1,0 +1,6 @@
+{% extends "base.html" %}
+{% block title %}{{ collection }} · NyumbaFind{% endblock %}
+{% block content %}
+<section class="intro"><div><p class="eyebrow">MONGODB COLLECTION</p><h1>{{ collection }}</h1><p class="sub">Records stored in nyumbaFindDB.</p></div><a class="button secondary" href="{{ url_for('index') }}">← Dashboard</a></section>
+<section class="panel"><div class="table-wrap"><table><thead><tr>{% for col in columns %}<th>{{ col }}</th>{% endfor %}</tr></thead><tbody>{% for row in rows %}<tr>{% for col in columns %}<td>{{ row[col] }}</td>{% endfor %}</tr>{% else %}<tr><td colspan="{{ columns|length }}">No records found.</td></tr>{% endfor %}</tbody></table></div></section>
+{% endblock %}
