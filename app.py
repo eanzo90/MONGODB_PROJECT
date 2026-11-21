@@ -6,9 +6,9 @@ from pymongo.errors import PyMongoError
 from bson.json_util import dumps
 
 app = Flask(__name__)
-app.secret_key = os.environ.get("SECRET_KEY", "nyumbafind-demo-change-this")
+app.secret_key = os.environ.get("SECRET_KEY")
 
-MONGO_URI = os.environ.get("MONGO_URI", "mongodb://localhost:27017/")
+MONGO_URI = os.environ.get("MONGODB_URI")
 DATABASE_NAME = "nyumbaFindDB"
 COLLECTIONS = {
     "users": ["_id", "fullName", "phone", "role", "district"],
